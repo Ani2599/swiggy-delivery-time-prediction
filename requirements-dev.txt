@@ -1,11 +1,13 @@
 numpy
-pandas 
-mlflow
+pandas
 scikit-learn
-dagshub
 lightgbm
+mlflow
+dagshub
 dvc
-awscli
 dvc[s3]
+awscli
+boto3
+botocore
 fastapi
 pytest
