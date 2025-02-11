@@ -47,3 +47,5 @@ jobs:
         if: success()
         env:
           DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          python scripts/promote_model_to_prod.py
