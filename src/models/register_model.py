@@ -49,19 +49,17 @@ if __name__ == "__main__":
     # Register the model
     model_version = mlflow.register_model(model_uri=model_registry_path, name=model_name)
 
-    # Get registered model details
+    # get the model version
     registered_model_version = model_version.version
     registered_model_name = model_version.name
-    logger.info(f"✅ Model {registered_model_name} registered with version {registered_model_version}")
-
-    # Promote model to "Production" (not just "Staging")
-    client = MlflowClient()
+    logger.info(f"The latest model version in model registry is {registered_model_version}")
     
-    # Transition model to "Production"
+    # update the stage of the model to staging
+    client = MlflowClient()
     client.transition_model_version_stage(
         name=registered_model_name,
         version=registered_model_version,
-        stage="Production"
+        stage="Staging"
     )
-
-    logger.info(f"🚀 Model {registered_model_name} (version {registered_model_version}) promoted to Production")
+    
+    logger.info("Model pushed to Staging stage")

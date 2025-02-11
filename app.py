@@ -17,12 +17,9 @@ set_config(transform_output='pandas')
 import dagshub
 import mlflow.client
 
+# Initialize DagsHub and MLflow
 dagshub.init(repo_owner='aniketnandanwar09', repo_name='swiggy-delivery-time-prediction', mlflow=True)
-
-
-# set the mlflow tracking server
 mlflow.set_tracking_uri("https://dagshub.com/aniketnandanwar09/swiggy-delivery-time-prediction.mlflow")
-
 
 class Data(BaseModel):  
     ID: str
@@ -44,7 +41,6 @@ class Data(BaseModel):
     multiple_deliveries: str
     Festival: str
     City: str
-
     
     
 def load_model_information(file_path):
@@ -52,20 +48,15 @@ def load_model_information(file_path):
         run_info = json.load(f)
         
     return run_info
-
-
-def load_transformer(transformer_path):
-    transformer = joblib.load(transformer_path)
-    return transformer
-
-
+def load_model(model_path):
+    model = joblib.load(model_path)
+    return model
 
 # columns to preprocess in data
 num_cols = ["age",
             "ratings",
             "pickup_time_minutes",
             "distance"]
-
 nominal_cat_cols = ['weather',
                     'type_of_order',
                     'type_of_vehicle',
@@ -73,21 +64,18 @@ nominal_cat_cols = ['weather',
                     "city_type",
                     "is_weekend",
                     "order_time_of_day"]
-
 ordinal_cat_cols = ["traffic","distance_type"]
 
-#mlflow client
+# mlflow client
 client = MlflowClient()
 
 # load the model info to get the model name
 model_name = load_model_information("run_information.json")['model_name']
 
 # stage of the model
-stage = "Production"
-
+stage = "Staging"
 # get the latest model version
-# latest_model_ver = client.get_latest_versions(name=model_name,stages=[stage])
-# print(f"Latest model in production is version {latest_model_ver[0].version}")
+latest_model_ver = client.get_latest_versions(name=model_name,stages=[stage])
 
 # load model path
 model_path = f"models:/{model_name}/{stage}"
@@ -97,7 +85,7 @@ model = mlflow.sklearn.load_model(model_path)
 
 # load the preprocessor
 preprocessor_path = "models/preprocessor.joblib"
-preprocessor = load_transformer(preprocessor_path)
+preprocessor = load_model(preprocessor_path)
 
 # build the model pipeline
 model_pipe = Pipeline(steps=[
@@ -144,7 +132,6 @@ def do_predictions(data: Data):
     predictions = model_pipe.predict(cleaned_data)[0]
 
     return predictions
-   
    
 if __name__ == "__main__":
     uvicorn.run(app="app:app")

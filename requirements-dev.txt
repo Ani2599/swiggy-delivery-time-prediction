@@ -8,3 +8,4 @@ dvc
 awscli
 dvc[s3]
 fastapi
+pytest
